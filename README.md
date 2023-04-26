@@ -82,7 +82,7 @@ const getVideoPath = (id) => {
       const end = Math.min(start + CHUNK_SIZE, fileSize - 1);
   
       // 요청한 범위가 파일 크기를 넘어설 경우 416 오류 반환
-      if (start >= fileSize || end >= fileSize) {
+      if (start >= fileSize || end >= fileSize) { 
         return res.status(416).send("Requested Range Not Satisfiable");
       }
   

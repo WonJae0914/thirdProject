@@ -10,9 +10,10 @@
 #### `Back-end`
   - Spring 5.2.18
   - Java 1.8
-  - MySQL 
+  - MySQL 5.2
   - JSP
-  - 
+  - AWS 3S
+  
 #### `Front-end`
   - HTML5
   - CSS3

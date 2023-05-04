@@ -29,7 +29,9 @@
 
 
 ## 3. ERD 설계 
+<details>
 ![3차ERD설계](https://user-images.githubusercontent.com/120714001/236103812-7e80c194-8de4-4e4b-ba48-bcbecd0b839b.png)
+</details>
 
 ## 4. 본인 구현 기능 핵심 코드 
 - 리뷰 게시판 CRUD (파일 업로드, 페이징)

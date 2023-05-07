@@ -1939,17 +1939,85 @@ public class LikeUnlikeDAO {
 
 ---
   
-## 5. 프로젝트 진행하며 어려웠던 점과 좋았던 점
+## 5. 프로젝트 진행하며 어려웠던 점
+  
+#### 5.1 문제점
+ 프로젝트를 하며 많은 어려움이 있었지만 다중 이미지 파일 업로드 시 이전에 삭제 했던 이미지가 같이 업로드 되거나 연속해서 게시글 작성 시 이전 글에 올렸던 이미지 파일이 같이 업로드 되는 문제가 발생
+  
+  1) 서버 실행 후 최초 1번은 정상적으로 구현됨.
+  2) 연속해서 게시글 작성 시 이전 게시글의 이미지 파일이 같이 업로드 됨.
+  3) 이미지 파일 삭제 후 게시글 작성 시 삭제 한 파일이 함께 업로드 됨.
 
-### 5.1. 어려웠던 점
+#### 5.2 원인 
+- 확인한 방법 : 
+프론트에서 s3fileupload 메소드로 넘어오는 파일 개수 확인.
+파일 저장 후 URL 값을 담은 LIST 내 파일 개수 확인.
 
-#### 5.1.1. 문제점
+ - 확인 결과 : 
+프론트에서 AWS서버까지 저장되는 과정은 문제가 없었다.
+저장된 파일의 URL을 담은 List의 값에 이전에 저장한 이미지 파일의 URL이 담겨있었다.
 
-#### 5.1.2. 원인 
+- 문제점 : 
+업로드 된 이미지 파일의 URL을 담을 List를 전역 변수로 지정해두어 메소드 로직이 끝나도 해당 데이터가 삭제되지 않고 그대로 남아있었던 것이다.
 
-#### 5.1.3. 결론
+<details>
+<summary style="color:pink;"><b>문제 코드</b></summary>
 
-### 5.2. 좋았던 점
+  ```java
+  @Service
+public class S3FileUploadService {
+
+    private final AmazonS3Client amazonS3Client; //아마존 계정정보 propertie파일 -> common-context에서 주입
+    @Value("${aws.s3.bucket}")
+    private String bucket; //S3버킷정보
+    @Value("${aws.s3.bucket.url}") //지역정보
+    private String defaultUrl;
+
+    List<String> urlList = new ArrayList<>(); //업로드된 url을 받기위한 리스트
+    // 전역 변수로 선언한 것이 문제 
+
+    public S3FileUploadService(AmazonS3Client amazonS3Client) {
+        this.amazonS3Client = amazonS3Client;
+    }
+
+    //생성자 주입
+    public List<String> upload(List<MultipartFile> uploadFile) throws IOException {...}
+  
+```
+</details>
+  
+
+#### 5.3. 해결방법 
+
+- 파일 업로드 메소드 작업 종료와 함께 List가 초기화 될 수 있도록 List를 메소드 안에 선언해주었다.
+  
+<details>
+<summary style="color:skyblue;"><b>해결 코드</b></summary>
+
+  ```java
+ @Service
+public class S3FileUploadService {
+
+
+    private final AmazonS3Client amazonS3Client; //아마존 계정정보 propertie파일 -> common-context에서 주입
+    @Value("${aws.s3.bucket}")
+    private String bucket; //S3버킷정보
+    @Value("${aws.s3.bucket.url}") //지역정보
+    private String defaultUrl;
+
+    public S3FileUploadService(AmazonS3Client amazonS3Client) {
+        this.amazonS3Client = amazonS3Client;
+    }
+
+    //생성자 주입
+    public List<String> upload(List<MultipartFile> uploadFile) throws IOException {
+    // 메소드 안에 선언
+    List<String> urlList = new ArrayList<>(); //업로드된 url을 받기위한 리스트
+     
+     }
+  
+```
+</details>
 
 </div>
 </details>
